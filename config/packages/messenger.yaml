@@ -1,0 +1,16 @@
+framework:
+  messenger:
+    transports:
+      courses_transport:
+        dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+        options:
+          exchange:
+            name: courses_exchange
+            type: direct
+          queues:
+            python_courses:
+              binding_keys: [course.python, course.both]
+            webdev_courses:
+              binding_keys: [course.webdev, course.both]
+    routing:
+      'App\Message\CourseEnrollmentMessage': courses_transport

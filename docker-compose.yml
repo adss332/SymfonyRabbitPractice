@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./.docker/mariadb
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: rabbitdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - pyha
+
+  rabbitmq:
+    container_name: rabbit
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - pyha
+
+  php:
+    container_name: php
+    build:
+      context: ./.docker/php
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/QueueTesting
+    ports:
+      - "8000:8000"
+    networks:
+      - pyha
+    depends_on:
+      - mariadb
+
+networks:
+  pyha: {}
+
+volumes:
+  mariadb_data:
